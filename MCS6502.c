@@ -12,7 +12,7 @@
 
 // If you uncomment the below and rebuild, you'll get a stream of
 // disassembly, register and stack state printed to stdout:
-//#define PRINT_DEBUG_OUTPUT
+#define PRINT_DEBUG_OUTPUT
 
 //
 // 6502 Instruction Set
@@ -1079,7 +1079,7 @@ MCS6502ExecNext(
     // Dump stack
     if (context->sp < 0xFF) {
         printf("  STACK: ");
-        for (uint sp = 0xFF; sp > context->sp; sp--) {
+        for (uint8 sp = 0xFF; sp > context->sp; sp--) {
             printf("%02X ", MCS6502ReadByte(0x0100 + sp, context));
         }
         printf("\n");
