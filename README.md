@@ -14,7 +14,7 @@ also wrote little code that can be executed on the cpu
 - instuction-set: https://www.masswerk.at/6502/6502_instruction_set.html
 compiling:
 ```bash
-gcc/ -g emu.c MCS6502.c -o emu -lm 
+gcc -g emu.c MCS6502.c -o emu -lm 
 ```
 
 - ### TODO
