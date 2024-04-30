@@ -1,8 +1,8 @@
-this is 6502 cpu emulator,
+this is 6502 cpu emulator, that can run assembly programs,
 
 base emulator was picked from here: https://github.com/bzotto/MCS6502
-this repo contains memory implementation for this cpu
-also wrote little code that can be executed on the cpu
+
+this repo contains memory implementation, programs loading functionality for this cpu.
 
 6502 CPU specs:
 
@@ -14,6 +14,7 @@ also wrote little code that can be executed on the cpu
 
 - instuction-set: https://www.masswerk.at/6502/6502_instruction_set.html
 
+### playing with emulator.
 compiling:
 ```bash
 gcc -g emu.c MCS6502.c -o emu -lm 
@@ -24,6 +25,7 @@ build a program before running it in cpu, available in /programs
 running programs:
 ```bash
 ./emu programs/basic.rom
+```
 
 - ### TODO
 - looking to create a way to write code easily into memory
