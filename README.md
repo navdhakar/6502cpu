@@ -30,3 +30,8 @@ running programs:
 - ### TODO
 - looking to create a way to write code easily into memory
 - write some interesting program
+
+references to study about 6502 architecture and how it works:
+- https://www.princeton.edu/~mae412/HANDOUTS/Datasheets/6502.pdf
+- https://www.youtube.com/watch?v=lNep0mzGNTU&list=PLjQDRjQfW-85S5QkX8wZbkqichM6TLYYt
+- http://www.6502.org/users/obelisk/6502/architecture.html
