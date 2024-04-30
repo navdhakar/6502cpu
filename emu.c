@@ -26,8 +26,33 @@ void write_code(Mem* memory){
 	mem_write(0x0200, 0xA9, memory);
 	mem_write(0x0200+1, 0x42, memory);
 }
+void load_rom_file(const char *filename, Word startAddress, Mem *memory) {
+    FILE *file = fopen(filename, "rb");
+    if (file == NULL) {
+        fprintf(stderr, "Error opening file %s\n", filename);
+        exit(1);
+    }
 
-int main (){
+    fseek(file, 0, SEEK_END);
+    long fileSize = ftell(file);
+    rewind(file);
+
+    if (fileSize > MEMORY_SIZE - startAddress) {
+        fprintf(stderr, "File %s is too large to fit in memory starting from address 0x%04X\n", filename, startAddress);
+        fclose(file);
+        exit(1);
+    }
+
+    fread(memory->Data + startAddress, fileSize, 1, file);
+    fclose(file);
+}
+
+int main (int argc, int *argv[]){
+	if (argc != 2) {
+        printf("Usage: ./emu path/file.rom\n", argv[0]);
+        return 1;
+    }
+	char program_path[100];
  	Mem *memory = (Mem *)malloc(sizeof(Mem));
 	if(memory == NULL) {
         fprintf(stderr, "Memory allocation failed\n");
@@ -40,17 +65,33 @@ int main (){
     printf("performing memory check...\n");
 	mem_write(0xFFFC, 0x00, memory); 
 	mem_write(0xFFFC+1, 0x02, memory); 
-	Byte rd = mem_read(0xFFFC, memory);
+	Byte rd = mem_read(0xFFFC+1, memory);
 	printf("read from address 0xFFFC data 0x%02X\n", rd); 
     printf("Memory check finished\n");
     printf("64 KB memory initialized\n");
-	write_code(memory);
+
+	//write_code(memory);
+	//laoding custom programs
+	snprintf(program_path, sizeof(program_path), "%s", argv[1]);
+	printf("loading program %s\n", program_path);
+	load_rom_file(program_path, 0x0200, memory);
+
+	// inititalizing CPU
     MCS6502ExecutionContext context;
     MCS6502Init(&context, mem_read, mem_write, memory);
     printf("Reset CPU.\n");
     MCS6502Reset(&context);
     printf("Started 6502 CPU emulator!\n");
+	//here we start executing instructions, still can't figure out progrem way to run it according to clock
+	// program counter start from address stored at 0xFFFC
 	MCS6502Tick(&context);
+	while(1){
+		while(context.pendingTiming>0){
+			MCS6502Tick(&context);
+		}
+		MCS6502Tick(&context);
+	}
+
     free(memory);
     return 0;
 }
