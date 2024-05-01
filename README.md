@@ -26,6 +26,14 @@ running programs:
 ```bash
 ./emu programs/basic.rom
 ```
+now we can run wozmon(kind of!!)
+```bash
+./emu programs/wozmon.rom
+```
+- our cpu load wozmon
+- can run in terminal as dispaly device(need more work)
+- need some input device
+
 
 - ### TODO
 - write BIOS
