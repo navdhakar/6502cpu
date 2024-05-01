@@ -153,7 +153,7 @@ ECHO:           BIT DSP         ; DA bit (B7) cleared yet?
 
 ; Interrupt Vectors
 ;.segment "RESETVEC"
-;
-;                .WORD $0F00     ; NMI
-;                .WORD RESET     ; RESET
-;                .WORD $0000     ; BRK/IRQ
+
+                ;.WORD $0F00     ; NMI
+                ;.WORD RESET     ; RESET
+                ;.WORD $0000     ; BRK/IRQ

@@ -1,5 +1,14 @@
 create an assembly program using 6502 Instruction set for the cpu.
 
+segmenting wozmon not working properly.
+
+so I had to manually set start location for wozmon at 0xFF00, 
+
+compile wozmon
+```bash
+make wozmon.rom
+```
+
 compiling the program
 ```bash
 make basic.rom

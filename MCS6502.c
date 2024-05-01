@@ -12,7 +12,7 @@
 
 // If you uncomment the below and rebuild, you'll get a stream of
 // disassembly, register and stack state printed to stdout:
-#define PRINT_DEBUG_OUTPUT
+//#define PRINT_DEBUG_OUTPUT
 
 //
 // 6502 Instruction Set

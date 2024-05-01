@@ -48,8 +48,12 @@ void load_rom_file(const char *filename, Word startAddress, Mem *memory) {
 }
 void display(Mem* memory){
 
+	static Byte lastValue = 0x00;
 	Byte rd = mem_read(0xD012, memory);
-	printf("read from address 0xFFFC data 0x%02X\n", rd); 
+	if(rd !=lastValue){
+		printf("%c\n", (char)rd-0x80); 
+		lastValue = rd;
+	}
 
 }
 
@@ -97,7 +101,7 @@ int main (int argc, int *argv[]){
         while (context.pendingTiming > 0) {
             MCS6502Tick(&context);
             cycleCount++;
-			//display(memory);
+			display(memory);
         }
         MCS6502Tick(&context);
     }
