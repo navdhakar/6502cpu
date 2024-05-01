@@ -46,6 +46,12 @@ void load_rom_file(const char *filename, Word startAddress, Mem *memory) {
     fread(memory->Data + startAddress, fileSize, 1, file);
     fclose(file);
 }
+void display(Mem* memory){
+
+	Byte rd = mem_read(0xD012, memory);
+	printf("read from address 0xFFFC data 0x%02X\n", rd); 
+
+}
 
 int main (int argc, int *argv[]){
 	if (argc != 2) {
@@ -64,7 +70,7 @@ int main (int argc, int *argv[]){
 	}
     printf("performing memory check...\n");
 	mem_write(0xFFFC, 0x00, memory); 
-	mem_write(0xFFFC+1, 0x02, memory); 
+	mem_write(0xFFFC+1, 0xFF, memory); 
 	Byte rd = mem_read(0xFFFC+1, memory);
 	printf("read from address 0xFFFC data 0x%02X\n", rd); 
     printf("Memory check finished\n");
@@ -74,7 +80,7 @@ int main (int argc, int *argv[]){
 	//laoding custom programs
 	snprintf(program_path, sizeof(program_path), "%s", argv[1]);
 	printf("loading program %s\n", program_path);
-	load_rom_file(program_path, 0x0200, memory);
+	load_rom_file("programs/wozmon.rom", 0xFF00, memory);
 
 	// inititalizing CPU
     MCS6502ExecutionContext context;
@@ -84,13 +90,17 @@ int main (int argc, int *argv[]){
     printf("Started 6502 CPU emulator!\n");
 	//here we start executing instructions, still can't figure out progrem way to run it according to clock
 	// program counter start from address stored at 0xFFFC
-	MCS6502Tick(&context);
-	while(1){
-		while(context.pendingTiming>0){
-			MCS6502Tick(&context);
-		}
-		MCS6502Tick(&context);
-	}
+	int cyclesPerSecond = 1000000 / 2; // Assuming a 2 MHz CPU
+    int cyclesPerRefresh = cyclesPerSecond / 30;
+    int cycleCount = 0;
+	  while (1) {
+        while (context.pendingTiming > 0) {
+            MCS6502Tick(&context);
+            cycleCount++;
+			//display(memory);
+        }
+        MCS6502Tick(&context);
+    }
 
     free(memory);
     return 0;

@@ -28,7 +28,7 @@ running programs:
 ```
 
 - ### TODO
-- looking to create a way to write code easily into memory
+- write BIOS
 - write some interesting program
 
 references to study about 6502 architecture and how it works:
