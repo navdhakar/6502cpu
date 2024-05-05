@@ -18,8 +18,7 @@ typedef struct{
 }Mem;
 
 // Function to read memory at a specific address
-Byte mem_read(Word address, void *readWriteContext) {
-    Mem *memory = (Mem *)readWriteContext;
+Byte mem_read(Word address, void *readWriteContext) { Mem *memory = (Mem *)readWriteContext;
     return memory->Data[address];
 }
 
@@ -36,7 +35,7 @@ void write_code(Mem* memory){
 void pma(Word address, Mem* memory){
 
 	Byte rd = mem_read(address, memory);
-	printf("data at address 0x%02X -> 0x%02X\n", rd); 
+	printf("data at address 0x%02X -> 0x%02X\n", address, rd); 
 }
 void load_rom_file(const char *filename, Word startAddress, Mem *memory) {
     FILE *file = fopen(filename, "rb");
@@ -66,6 +65,8 @@ void display(Mem* memory){
 		printf("%c\n", (char)rd-0x80); 
 		lastValue = rd;
 	}
+	
+    mem_write(DSP, 0x7F, memory);
 
 }
 int kbhit(void) {
@@ -130,6 +131,7 @@ void keyboard_polling(Mem* memory){
             //set bit 7 high => keyboard is ready for reading
             mem_write(KBDCR, 0x80, memory);
 			pma(KBD, memory);
+			pma(KBDCR, memory);
             //set bit 7 high => keyboard is ready for reading
 
             //set 'DA' => getting ready for echo from wozmon
@@ -180,11 +182,10 @@ int main (int argc, int *argv[]){
     int cyclesPerRefresh = cyclesPerSecond / 30;
     int cycleCount = 0;
 	  while (1) {
-        while (context.pendingTiming > 0) {
             MCS6502Tick(&context);
             cycleCount++;
+			keyboard_polling(memory);
 			display(memory);
-        }
     }
 
     free(memory);
