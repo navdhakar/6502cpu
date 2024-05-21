@@ -5,17 +5,18 @@
 #include <unistd.h>
 #include "MCS6502.h"
 
-#define MEMORY_SIZE (64 * 1024)
-typedef unsigned char Byte;
+#define MEMORY_SIZE (64 * 1024) 
+typedef unsigned char Byte; 
 typedef unsigned short Word;
 
+#define DISPLAY_BUFFER_LEN 30 
 #define IN 0x0200 
 #define KBD 0xD010 
 #define KBDCR 0xD011
 #define DSP 0xD012
 #define DSPCR 0xD013
-typedef struct{
-    Byte Data[MEMORY_SIZE];
+typedef struct{ 
+Byte Data[MEMORY_SIZE];
 }Mem;
 
 // Function to read memory at a specific address
@@ -59,13 +60,15 @@ void load_rom_file(const char *filename, Word startAddress, Mem *memory) {
     fclose(file);
 }
 void display(Mem* memory){
-
 	static Byte lastValue = 0x00;
-	Byte rd = mem_read(0xD012, memory);
-	if(rd != 0x7F){
-		printf("%c\n", (char)rd-0x80); 
-		lastValue = rd;
+	for(int i=0;i<DISPLAY_BUFFER_LEN;i++){
+		Byte rd = mem_read(IN+i, memory);
+		if(rd != 0x7F){
+			printf("%c", (char)rd-0x80); 
+			lastValue = rd;
+		}
 	}
+	printf("\n");
 	//if(rd !=lastValue){
 	//	printf("%c\n", (char)rd-0x80); 
 	//	lastValue = rd;
@@ -133,6 +136,7 @@ void keyboard_polling(Mem* memory){
         if((key >= 65 && key <= 90) || (key >= 48 && key <= 57) || key == 13 || key == 32){
             // base is 0x80 to convert it to something wozmon echo can understand
             //write key to keyboard
+			printf("in keyboard\n");	
             mem_write(KBDCR, 0xA7, memory);
             mem_write(KBD, key+0x80, memory);
             //set bit 7 high => keyboard is ready for reading
@@ -188,16 +192,19 @@ int main (int argc, int *argv[]){
     int cycleCount = 0;
     int cycles = 0;
 
+	for(int i=0;i<DISPLAY_BUFFER_LEN;i++){
+    	mem_write(IN+i, 0x80, memory);
+	}
     while (1) {
-        while (cycles < cyclesPerRefresh) {
+		while(cycles<cyclesPerRefresh){
             MCS6502Tick(&context);
-			pma((0x200+context.y)-0x002, memory);
-			pma((0x200+context.y)-0x001, memory);
-			pma(0x200+context.y, memory);
+			pma((IN+context.y)-1, memory);
+			pma(IN+context.y, memory);
 			pma(KBDCR, memory);
-        	display(memory);
+			pma(KBD, memory);
             cycles++;
-        }
+		}
+        display(memory);
         keyboard_polling(memory);
         cycles = 0;	
    }
