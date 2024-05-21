@@ -61,10 +61,12 @@ void display(Mem* memory){
 
 	static Byte lastValue = 0x00;
 	Byte rd = mem_read(0xD012, memory);
-	if(rd !=lastValue){
+	//if(rd !=lastValue){
+	//	printf("%c\n", (char)rd-0x80); 
+	//	lastValue = rd;
+	//}
 		printf("%c\n", (char)rd-0x80); 
 		lastValue = rd;
-	}
 	
     mem_write(DSP, 0x7F, memory);
 
@@ -132,6 +134,8 @@ void keyboard_polling(Mem* memory){
             mem_write(KBDCR, 0x80, memory);
 			pma(KBD, memory);
 			pma(KBDCR, memory);
+			pma(DSP, memory);
+			pma(DSPCR, memory);
             //set bit 7 high => keyboard is ready for reading
 
             //set 'DA' => getting ready for echo from wozmon
@@ -178,16 +182,22 @@ int main (int argc, int *argv[]){
     printf("Started 6502 CPU emulator!\n");
 	//here we start executing instructions, still can't figure out progrem way to run it according to clock
 	// program counter start from address stored at 0xFFFC
-	int cyclesPerSecond = 1000000 / 2; // Assuming a 2 MHz CPU
+
+	int cyclesPerSecond = 1000000/2; // Assuming a 2 MHz CPU
     int cyclesPerRefresh = cyclesPerSecond / 30;
     int cycleCount = 0;
-	  while (1) {
-            MCS6502Tick(&context);
-            cycleCount++;
-			keyboard_polling(memory);
-			display(memory);
-    }
+    int cycles = 0;
 
+    while (1) {
+        while (cycles < cyclesPerRefresh) {
+            MCS6502Tick(&context);
+            cycles++;
+        }
+        keyboard_polling(memory);
+        display(memory);
+        cycles = 0;
+		continue;
+    }
     free(memory);
     return 0;
 }
