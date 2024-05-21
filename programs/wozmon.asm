@@ -27,7 +27,7 @@ RESET:          CLD             ; Clear decimal arithmetic mode.
                 CLI
                 LDY #$7F        ; Mask for DSP data direction register.
                 STY DSP         ; Set it up.
-                LDA #$A7        ; KBD and DSP control register mask.
+                LDA #$42        ; KBD and DSP control register mask.
                 STA KBDCR       ; Enable interrupts, set CA1, CB1, for
                 STA DSPCR       ;  positive edge sense/output mode.
 NOTCR:          CMP #'_'+$80    ; "_"?

@@ -9,6 +9,7 @@
 typedef unsigned char Byte;
 typedef unsigned short Word;
 
+#define IN 0x0200 
 #define KBD 0xD010 
 #define KBDCR 0xD011
 #define DSP 0xD012
@@ -30,7 +31,7 @@ void mem_write(Word address, Byte value, void *readWriteContext) {
 //writing instuction A9 (LDA) and filling next 8 bit with value 42 , as A9 instuction load immediate byte into accumulator.
 void write_code(Mem* memory){
 	mem_write(0x0200, 0xA9, memory);
-	mem_write(0x0200+1, 0x42, memory);
+	mem_write(0x0201, 0x42, memory);
 }
 void pma(Word address, Mem* memory){
 
@@ -61,14 +62,17 @@ void display(Mem* memory){
 
 	static Byte lastValue = 0x00;
 	Byte rd = mem_read(0xD012, memory);
+	if(rd != 0x7F){
+		printf("%c\n", (char)rd-0x80); 
+		lastValue = rd;
+	}
 	//if(rd !=lastValue){
 	//	printf("%c\n", (char)rd-0x80); 
 	//	lastValue = rd;
 	//}
-		printf("%c\n", (char)rd-0x80); 
-		lastValue = rd;
 	
     mem_write(DSP, 0x7F, memory);
+    mem_write(KBDCR, 0x42, memory);
 
 }
 int kbhit(void) {
@@ -129,13 +133,9 @@ void keyboard_polling(Mem* memory){
         if((key >= 65 && key <= 90) || (key >= 48 && key <= 57) || key == 13 || key == 32){
             // base is 0x80 to convert it to something wozmon echo can understand
             //write key to keyboard
+            mem_write(KBDCR, 0xA7, memory);
             mem_write(KBD, key+0x80, memory);
             //set bit 7 high => keyboard is ready for reading
-            mem_write(KBDCR, 0x80, memory);
-			pma(KBD, memory);
-			pma(KBDCR, memory);
-			pma(DSP, memory);
-			pma(DSPCR, memory);
             //set bit 7 high => keyboard is ready for reading
 
             //set 'DA' => getting ready for echo from wozmon
@@ -191,13 +191,16 @@ int main (int argc, int *argv[]){
     while (1) {
         while (cycles < cyclesPerRefresh) {
             MCS6502Tick(&context);
+			pma((0x200+context.y)-0x002, memory);
+			pma((0x200+context.y)-0x001, memory);
+			pma(0x200+context.y, memory);
+			pma(KBDCR, memory);
+        	display(memory);
             cycles++;
         }
         keyboard_polling(memory);
-        display(memory);
-        cycles = 0;
-		continue;
-    }
+        cycles = 0;	
+   }
     free(memory);
     return 0;
 }

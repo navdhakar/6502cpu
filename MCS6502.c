@@ -12,7 +12,7 @@
 
 // If you uncomment the below and rebuild, you'll get a stream of
 // disassembly, register and stack state printed to stdout:
-//#define PRINT_DEBUG_OUTPUT
+#define PRINT_DEBUG_OUTPUT
 
 //
 // 6502 Instruction Set
@@ -406,6 +406,7 @@ MCS6502ExecNext(
     
 #ifdef PRINT_DEBUG_OUTPUT
     char * dis = DisassembleCurrentInstruction(instruction, context);
+	printf("opcode %d\n", opcode);
     printf("%04X: %s\n", context->pc, dis);
 #endif
     
